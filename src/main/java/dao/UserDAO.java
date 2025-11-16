@@ -1,0 +1,135 @@
+package dao;
+
+import model.User;
+import java.sql.*;
+import org.mindrot.jbcrypt.BCrypt;
+
+public class UserDAO {
+
+    /* =====================================================
+       LẤY USER THEO TÊN ĐĂNG NHẬP (PHỤ TRỢ CHO LOGIN)
+       ===================================================== */
+    public User findByUsername(String tenDangNhap) throws Exception {
+        String sql = """
+                SELECT 
+                    nd.MaNguoiDung,
+                    nd.TenDangNhap,
+                    nd.MatKhau,
+                    nd.HoTen,
+                    nd.Email,
+                    nd.SoDienThoai,
+                    nd.MaQuyen,
+                    nd.NgayTao,
+                    nd.TrangThai,
+                    q.TenQuyen
+                FROM NguoiDung nd
+                JOIN Quyen q ON nd.MaQuyen = q.MaQuyen
+                WHERE nd.TenDangNhap = ?
+                """;
+
+        try (Connection c = DBHelper.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+
+            ps.setString(1, tenDangNhap);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    User u = new User();
+                    u.setMaNguoiDung(rs.getInt("MaNguoiDung"));
+                    u.setTenDangNhap(rs.getString("TenDangNhap"));
+                    u.setMatKhau(rs.getString("MatKhau"));
+                    u.setHoTen(rs.getString("HoTen"));
+                    u.setEmail(rs.getString("Email"));
+                    u.setSoDienThoai(rs.getString("SoDienThoai"));
+                    u.setMaQuyen(rs.getInt("MaQuyen"));
+                    Timestamp ts = rs.getTimestamp("NgayTao");
+                    u.setNgayTao(ts != null ? ts.toLocalDateTime() : null);
+                    u.setTrangThai(rs.getBoolean("TrangThai"));
+                    u.setTenQuyen(rs.getString("TenQuyen"));
+                    return u;
+                }
+            }
+        }
+        return null;
+    }
+
+    /* =====================================================
+       KIỂM TRA USERNAME TỒN TẠI (REGISTER)
+       ===================================================== */
+    public boolean exists(String tenDangNhap) throws Exception {
+        String sql = "SELECT 1 FROM NguoiDung WHERE TenDangNhap = ?";
+        try (Connection c = DBHelper.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+
+            ps.setString(1, tenDangNhap);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
+    /* =====================================================
+       TẠO USER MỚI (ĐĂNG KÝ)
+       mặc định: MaQuyen = 2 (CUSTOMER)
+       ===================================================== */
+    public boolean createUser(User u) throws Exception {
+        String sql = """
+                INSERT INTO NguoiDung
+                (TenDangNhap, MatKhau, HoTen, Email, SoDienThoai, MaQuyen, TrangThai)
+                VALUES (?, ?, ?, ?, ?, ?, 1)
+                """;
+
+        try (Connection c = DBHelper.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+
+            String hashedPassword = u.getMatKhau();
+
+            // 🔐 Nếu chưa hash, thì hash BCrypt:
+            if (hashedPassword != null && !hashedPassword.startsWith("$2a$")) {
+                hashedPassword = BCrypt.hashpw(hashedPassword, BCrypt.gensalt(12));
+            }
+
+            ps.setString(1, u.getTenDangNhap());
+            ps.setString(2, hashedPassword);
+            ps.setString(3, u.getHoTen());
+            ps.setString(4, u.getEmail());
+            ps.setString(5, u.getSoDienThoai());
+            ps.setInt(6, u.getMaQuyen()); // 1 = Admin, 2 = Customer
+
+            return ps.executeUpdate() > 0;
+        }
+    }
+
+    /* =====================================================
+       LOGIN: TRẢ VỀ ĐỐI TƯỢNG USER (DÙNG CHO LoginServlet)
+       trả về null nếu sai mật khẩu / tài khoản bị khóa
+       ===================================================== */
+    public User login(String tenDangNhap, String plainPassword) throws Exception {
+        User u = findByUsername(tenDangNhap);
+        if (u == null) return null;           // không tồn tại
+        if (!u.isTrangThai()) return null;    // tài khoản bị khóa
+
+        String hashedOrPlain = u.getMatKhau();
+        if (hashedOrPlain == null) return null;
+
+        boolean match;
+
+        // Nếu là mật khẩu đã hash BCrypt
+        if (hashedOrPlain.startsWith("$2a$")) {
+            match = BCrypt.checkpw(plainPassword, hashedOrPlain);
+        } else {
+            // Trường hợp (hiếm) DB đang lưu plain text
+            match = plainPassword.equals(hashedOrPlain);
+        }
+
+        return match ? u : null;
+    }
+
+    /* =====================================================
+       HÀM CŨ: XÁC THỰC ĐĂNG NHẬP (TRUE/FALSE)
+       (vẫn giữ cho những chỗ khác trong project đang dùng)
+       ===================================================== */
+    public boolean validateLogin(String tenDangNhap, String plainPassword) throws Exception {
+        return login(tenDangNhap, plainPassword) != null;
+    }
+}
