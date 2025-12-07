@@ -1,5 +1,3 @@
-// ================= Banner Carousel Handler =================
-
 document.addEventListener("DOMContentLoaded", function () {
     var wrapper  = document.querySelector(".banner-wrapper");
     if (!wrapper) return;

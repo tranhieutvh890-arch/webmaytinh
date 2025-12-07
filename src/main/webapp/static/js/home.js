@@ -1,6 +1,3 @@
-// =======================
-// 1. GIỎ HÀNG (localStorage)
-// =======================
 function updateCartCount() {
     var cartStr = localStorage.getItem("cart");
     var cart = cartStr ? JSON.parse(cartStr) : [];
@@ -47,9 +44,6 @@ function addToCart(product) {
     updateCartCount();
 }
 
-// =======================
-// 2. POPUP ĐĂNG NHẬP / ĐĂNG KÝ
-// =======================
 function initAuthModal() {
     var modal = document.getElementById("loginModal");
     if (!modal) return;
@@ -104,7 +98,6 @@ function initAuthModal() {
         }
     });
 
-    // ============= ĐĂNG NHẬP =============
     var loginRealForm = document.getElementById("loginRealForm");
     if (loginRealForm && typeof LOGIN_URL !== "undefined") {
         loginRealForm.addEventListener("submit", function (e) {
@@ -142,7 +135,6 @@ function initAuthModal() {
         });
     }
 
-    // ============= ĐĂNG KÝ =============
     var registerRealForm = document.getElementById("registerRealForm");
     if (registerRealForm && typeof REGISTER_URL !== "undefined") {
         registerRealForm.addEventListener("submit", function (e) {
@@ -186,12 +178,6 @@ function initAuthModal() {
     }
 }
 
-// =======================
-// 3. BANNER SLIDER TRANG CHỦ
-// =======================
-// =======================
-// 3. BANNER SLIDER TRANG CHỦ
-// =======================
 function initBannerSlider() {
     var wrapper  = document.querySelector(".banner-wrapper");
     if (!wrapper) {
@@ -214,10 +200,8 @@ function initBannerSlider() {
     var autoTimer = null;
 
     function updateSlide() {
-        // Di chuyển wrapper
         wrapper.style.transform = "translateX(-" + (currentSlide * 100) + "%)";
 
-        // Cập nhật dot active
         for (var i = 0; i < dots.length; i++) {
             if (i === currentSlide) {
                 dots[i].classList.add("active");
@@ -242,7 +226,6 @@ function initBannerSlider() {
         }
     }
 
-    // Nút next
     if (nextBtn) {
         nextBtn.addEventListener("click", function () {
             currentSlide = (currentSlide + 1) % totalSlides;
@@ -251,7 +234,6 @@ function initBannerSlider() {
         });
     }
 
-    // Nút prev
     if (prevBtn) {
         prevBtn.addEventListener("click", function () {
             currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
@@ -260,7 +242,6 @@ function initBannerSlider() {
         });
     }
 
-    // Click vào dot
     for (var j = 0; j < dots.length; j++) {
         (function (index) {
             dots[index].addEventListener("click", function () {
@@ -271,17 +252,13 @@ function initBannerSlider() {
         })(j);
     }
 
-    // Khởi tạo lần đầu
     updateSlide();
     startAuto();
 
     console.log("initBannerSlider chạy xong, totalSlides =", totalSlides);
 }
 
-// =======================
-// 4. KHỞI TẠO SAU KHI DOM SẴN SÀNG
-// =======================
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", function() {
     updateCartCount();
     initAuthModal();
     initBannerSlider();

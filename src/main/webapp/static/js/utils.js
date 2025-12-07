@@ -1,5 +1,3 @@
-// ================= Cart Utilities =================
-
 function updateCartCount() {
   var cart = JSON.parse(localStorage.getItem('cart')) || [];
   var total = 0;
@@ -81,8 +79,6 @@ function getCart() {
   return JSON.parse(localStorage.getItem('cart')) || [];
 }
 
-// ================= Product Detail Page =================
-
 function updateQuantity(change) {
   var input = document.getElementById('quantity');
   if (!input) return;
@@ -93,9 +89,6 @@ function updateQuantity(change) {
 function addToCartFromDetail() {
   var qtyInput = document.getElementById('quantity');
   var quantity = qtyInput ? parseInt(qtyInput.value) || 1 : 1;
-  if (quantity < 1) return;
-  
-  // Get product info from page
   var h1 = document.querySelector('.product-info h1');
   var productName = h1 ? h1.textContent : 'Sản phẩm';
   
@@ -104,10 +97,6 @@ function addToCartFromDetail() {
   var price = parseInt(priceText.replace(/[^0-9]/g, '')) || 0;
   
   var mainImg = document.getElementById('mainImage');
-  var image = mainImg ? mainImg.src : '/static/images/placeholder.png';
-  
-  // Get product ID from URL
-  var urlParams = new URLSearchParams(window.location.search);
   var productId = 'sp' + (urlParams.get('id') || Date.now());
   var detailUrl = window.location.href;
 
@@ -121,12 +110,8 @@ function addToCartFromDetail() {
   });
 }
 
-// ================= Initialize =================
-
 document.addEventListener('DOMContentLoaded', function() {
   updateCartCount();
-  
-  // Add event listener to buy button if exists
   var addBtn = document.querySelector('.buy-btn');
   if (addBtn) {
     addBtn.addEventListener('click', addToCartFromDetail);

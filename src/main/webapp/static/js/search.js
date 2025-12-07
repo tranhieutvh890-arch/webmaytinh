@@ -1,4 +1,3 @@
-// Shared search logic - ES5 compatible
 function handleSearch(event) {
   try {
     if (event && event.preventDefault) event.preventDefault();
@@ -14,8 +13,6 @@ function handleSearch(event) {
 
     for (var k = 0; k < products.length; k++) {
       var product = products[k];
-      
-      // Get product name
       var titleEl = product.querySelector('a.card__title, .card__title, .product-name');
       var productName = '';
       
@@ -26,8 +23,7 @@ function handleSearch(event) {
           .toLowerCase();
       }
       
-      // Get category if exists
-      var catEl = product.querySelector('.product-category');
+      var catEl = document.querySelector('.product-category');
       var productCategory = '';
       if (catEl && catEl.textContent) {
         productCategory = catEl.textContent
@@ -40,7 +36,6 @@ function handleSearch(event) {
         console.log('Product:', productName);
       }
 
-      // Compare (case-insensitive)
       if (productName.indexOf(searchTerm) >= 0 || productCategory.indexOf(searchTerm) >= 0) {
         product.style.display = '';
         productMatches++;
@@ -99,7 +94,6 @@ function handleSearch(event) {
       catsEl.style.display = 'none';
     }
 
-    // If no products but 1 matching category, redirect
     if (productMatches === 0 && matchedCats.length === 1) {
       var href = matchedCats[0].getAttribute('href');
       if (href) {
