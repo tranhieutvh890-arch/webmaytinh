@@ -1,0 +1,63 @@
+name: Build & Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: testpass
+          MYSQL_DATABASE: laptop4study
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+        ports:
+          - 3306:3306
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+        cache: maven
+    
+    - name: Import Database Schema
+      run: |
+        mysql -h 127.0.0.1 -u root -ptestpass laptop4study < src/main/webapp/database.sql
+    
+    - name: Build with Maven
+      run: mvn clean package -DskipTests
+    
+    - name: Check Build Output
+      run: |
+        if [ -f "target/ROOT.war" ]; then
+          echo "✅ Build successful! WAR file created."
+          ls -lh target/ROOT.war
+        else
+          echo "❌ Build failed! WAR file not found."
+          exit 1
+        fi
+    
+    - name: Run Tests
+      run: mvn test
+    
+    - name: Upload to Artifact
+      uses: actions/upload-artifact@v3
+      if: success()
+      with:
+        name: ROOT.war
+        path: target/ROOT.war
+        retention-days: 7

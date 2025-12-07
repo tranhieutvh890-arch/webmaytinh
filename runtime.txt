@@ -1,0 +1,14 @@
+# Heroku/Railway Platform Configuration
+
+## Runtime
+runtime_version=11
+
+## Build
+install.packages.with.mvn=true
+maven.version=3.8.1
+
+## Procfile for Heroku/Railway
+# Uses embedded Tomcat via Maven plugin
+
+## No additional settings needed
+# Railway will auto-detect pom.xml and build accordingly

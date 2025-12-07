@@ -1,0 +1,9 @@
+{
+  "build": {
+    "builder": "maven"
+  },
+  "deploy": {
+    "restartPolicyType": "always",
+    "restartPolicyMaxRetries": 0
+  }
+}
