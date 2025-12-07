@@ -1,32 +1,34 @@
-// Shared search logic used by all pages
+// Shared search logic - ES5 compatible
 function handleSearch(event) {
   try {
     if (event && event.preventDefault) event.preventDefault();
-    const raw = (document.getElementById('searchInput') || {}).value || '';
-    const searchTerm = raw.trim().toLowerCase();
+    var searchInput = document.getElementById('searchInput') || {};
+    var raw = searchInput.value || '';
+    var searchTerm = raw.trim().toLowerCase();
     if (!searchTerm) return false;
 
-    console.log('🔍 Tìm kiếm:', searchTerm); // Debug
+    console.log('Search term:', searchTerm);
 
-    const products = document.querySelectorAll('article.card, .product-item');
-    let productMatches = 0;
+    var products = document.querySelectorAll('article.card, .product-item');
+    var productMatches = 0;
 
-    products.forEach(product => {
-      // Lấy tên sản phẩm từ link tiêu đề
-      const titleEl = product.querySelector('a.card__title, .card__title, .product-name');
-      let productName = '';
+    for (var k = 0; k < products.length; k++) {
+      var product = products[k];
+      
+      // Get product name
+      var titleEl = product.querySelector('a.card__title, .card__title, .product-name');
+      var productName = '';
       
       if (titleEl && titleEl.textContent) {
-        // Normalize: trim, lowercase, xóa dấu cách thừa
         productName = titleEl.textContent
           .trim()
-          .replace(/\s+/g, ' ')  // Xóa khoảng trắng thừa
+          .replace(/\s+/g, ' ')
           .toLowerCase();
       }
       
-      // Lấy danh mục (nếu có)
-      const catEl = product.querySelector('.product-category');
-      let productCategory = '';
+      // Get category if exists
+      var catEl = product.querySelector('.product-category');
+      var productCategory = '';
       if (catEl && catEl.textContent) {
         productCategory = catEl.textContent
           .trim()
@@ -34,69 +36,74 @@ function handleSearch(event) {
           .toLowerCase();
       }
 
-      // Debug: hiển thị tên sản phẩm được tìm thấy
       if (productName.length > 0) {
-        console.log('  📦', productName);
+        console.log('Product:', productName);
       }
 
-      // So sánh (không phân biệt chữ hoa/thường)
-      if (productName.includes(searchTerm) || productCategory.includes(searchTerm)) {
+      // Compare (case-insensitive)
+      if (productName.indexOf(searchTerm) >= 0 || productCategory.indexOf(searchTerm) >= 0) {
         product.style.display = '';
         productMatches++;
       } else {
         product.style.display = 'none';
       }
-    });
+    }
 
-    console.log('✅ Tìm thấy:', productMatches, 'sản phẩm'); // Debug
+    console.log('Found:', productMatches, 'products');
 
-    const catLinks = Array.from(document.querySelectorAll('.catbar a.cat'));
-    const matchedCats = catLinks.filter(a => 
-      (a.textContent || '')
+    var catLinks = document.querySelectorAll('.catbar a.cat');
+    var matchedCats = [];
+    
+    for (var i = 0; i < catLinks.length; i++) {
+      var a = catLinks[i];
+      var text = (a.textContent || '')
         .trim()
         .replace(/\s+/g, ' ')
-        .toLowerCase()
-        .includes(searchTerm)
-    );
+        .toLowerCase();
+      if (text.indexOf(searchTerm) >= 0) {
+        matchedCats.push(a);
+      }
+    }
 
-    const resultsEl = document.getElementById('searchResults') || createSearchResults();
-    const catsEl = document.getElementById('categoryMatches') || createCategoryResults();
+    var resultsEl = document.getElementById('searchResults') || createSearchResults();
+    var catsEl = document.getElementById('categoryMatches') || createCategoryResults();
 
     if (productMatches > 0) {
-      resultsEl.textContent = `Tìm thấy ${productMatches} sản phẩm cho "${raw}"`;
+      resultsEl.textContent = 'Found ' + productMatches + ' products for "' + raw + '"';
       resultsEl.style.display = 'block';
     } else {
-      resultsEl.textContent = `Không tìm thấy sản phẩm cho "${raw}"`;
+      resultsEl.textContent = 'No products found for "' + raw + '"';
       resultsEl.style.display = 'block';
     }
 
     catsEl.innerHTML = '';
     if (matchedCats.length > 0) {
-      const heading = document.createElement('div');
-      heading.textContent = 'Danh mục khớp:';
+      var heading = document.createElement('div');
+      heading.textContent = 'Matching categories:';
       heading.style.fontWeight = '600';
       heading.style.marginBottom = '6px';
       catsEl.appendChild(heading);
 
-      matchedCats.forEach(a => {
-        const link = document.createElement('a');
-        link.href = a.href || a.getAttribute('href');
-        link.textContent = a.textContent.trim();
+      for (var j = 0; j < matchedCats.length; j++) {
+        var catLink = matchedCats[j];
+        var link = document.createElement('a');
+        link.href = catLink.href || catLink.getAttribute('href');
+        link.textContent = catLink.textContent.trim();
         link.style.display = 'inline-block';
         link.style.margin = '4px 8px 4px 0';
         link.className = 'cat-match-link';
         catsEl.appendChild(link);
-      });
+      }
       catsEl.style.display = 'block';
     } else {
       catsEl.style.display = 'none';
     }
 
-    // Nếu không tìm thấy sản phẩm nhưng có 1 danh mục khớp, chuyển hướng
+    // If no products but 1 matching category, redirect
     if (productMatches === 0 && matchedCats.length === 1) {
-      const href = matchedCats[0].getAttribute('href');
+      var href = matchedCats[0].getAttribute('href');
       if (href) {
-        console.log('🔄 Chuyển hướng đến:', href);
+        console.log('Redirecting to:', href);
         window.location.href = href;
         return false;
       }
@@ -104,31 +111,30 @@ function handleSearch(event) {
 
     return false;
   } catch (err) {
-    console.error('❌ Lỗi tìm kiếm:', err);
-    const r = document.getElementById('searchResults') || createSearchResults();
-    r.textContent = 'Lỗi tìm kiếm: ' + (err && err.message ? err.message : String(err));
+    console.error('Search error:', err);
+    var r = document.getElementById('searchResults') || createSearchResults();
+    r.textContent = 'Search error: ' + (err && err.message ? err.message : String(err));
     r.style.display = 'block';
     return false;
   }
 }
 
 function createSearchResults() {
-  const results = document.createElement('div');
+  var results = document.createElement('div');
   results.id = 'searchResults';
   results.style.cssText = 'margin: 18px 0; padding: 8px 12px; text-align: left; font-weight: 600; background:#fff9; border-radius:4px;';
-  const main = document.querySelector('main') || document.body;
+  var main = document.querySelector('main') || document.body;
   main.insertAdjacentElement('afterbegin', results);
   return results;
 }
 
 function createCategoryResults() {
-  const el = document.createElement('div');
+  var el = document.createElement('div');
   el.id = 'categoryMatches';
   el.style.cssText = 'margin-top:8px;';
-  const sr = document.getElementById('searchResults') || createSearchResults();
+  var sr = document.getElementById('searchResults') || createSearchResults();
   sr.insertAdjacentElement('afterend', el);
   return el;
 }
 
-// Optionally expose for debugging
 window.handleSearch = handleSearch;
