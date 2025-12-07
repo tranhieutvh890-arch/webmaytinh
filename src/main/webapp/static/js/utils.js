@@ -1,4 +1,4 @@
-function updateCartCount() {
+﻿function updateCartCount() {
   var cart = JSON.parse(localStorage.getItem('cart')) || [];
   var total = 0;
   for (var i = 0; i < cart.length; i++) {
@@ -90,7 +90,7 @@ function addToCartFromDetail() {
   var qtyInput = document.getElementById('quantity');
   var quantity = qtyInput ? parseInt(qtyInput.value) || 1 : 1;
   var h1 = document.querySelector('.product-info h1');
-  var productName = h1 ? h1.textContent : 'Sản phẩm';
+  var productName = h1 ? h1.textContent : 'Sáº£n pháº©m';
   
   var priceEl = document.querySelector('.current-price');
   var priceText = priceEl ? priceEl.textContent : '0';
@@ -117,3 +117,4 @@ document.addEventListener('DOMContentLoaded', function() {
     addBtn.addEventListener('click', addToCartFromDetail);
   }
 });
+

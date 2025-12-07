@@ -1,4 +1,4 @@
-<%@ page contentType="text/html; charset=UTF-8" language="java" %>
+﻿<%@ page contentType="text/html; charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <!DOCTYPE html>
@@ -12,7 +12,7 @@
 
 <div class="admin-layout">
 
-    <!-- ========== SIDEBAR ========== -->
+    
     <aside class="sidebar">
         <div class="sidebar-logo">
             <span class="logo-main">N4</span><span class="logo-sub">Computer</span>
@@ -20,100 +20,100 @@
 
         <nav class="sidebar-nav">
             <a href="<c:url value='/admin/dashboard'/>" class="nav-item active">
-                <span class="nav-icon">🏠</span> Dữ liệu thống kê
+                <span class="nav-icon">ðŸ </span> Dá»¯ liá»‡u thá»‘ng kÃª
             </a>
             <a href="<c:url value='/admin/products'/>" class="nav-item">
-                <span class="nav-icon">💻</span> Quản lý Sản phẩm
+                <span class="nav-icon">ðŸ’»</span> Quáº£n lÃ½ Sáº£n pháº©m
             </a>
             <a href="<c:url value='/admin/orders'/>" class="nav-item">
-                <span class="nav-icon">📦</span> Quản lý Đơn hàng
+                <span class="nav-icon">ðŸ“¦</span> Quáº£n lÃ½ ÄÆ¡n hÃ ng
             </a>
             <a href="<c:url value='/admin/customers'/>" class="nav-item">
-                <span class="nav-icon">👥</span> Quản lý Khách hàng
+                <span class="nav-icon">ðŸ‘¥</span> Quáº£n lÃ½ KhÃ¡ch hÃ ng
             </a>
         </nav>
 
         <a href="${pageContext.request.contextPath}/home" class="back-store">
-            ← Về trang bán hàng
+            â† Vá» trang bÃ¡n hÃ ng
         </a>
     </aside>
 
-    <!-- ========== MAIN CONTENT ========== -->
+    
     <main class="main">
 
-        <!-- TOPBAR -->
+        
         <header class="topbar">
             <div class="topbar-left">
-                <h1 class="page-title">Tổng quan hệ thống</h1>
+                <h1 class="page-title">Tá»•ng quan há»‡ thá»‘ng</h1>
             </div>
             <div class="topbar-right">
                 <span class="hello-text">
-                    Xin chào,
+                    Xin chÃ o,
                     <strong>
                         <c:choose>
                             <c:when test="${not empty sessionScope.hoTen}">
                                 <c:out value="${sessionScope.hoTen}"/>
                             </c:when>
-                            <c:otherwise>Quản trị viên</c:otherwise>
+                            <c:otherwise>Quáº£n trá»‹ viÃªn</c:otherwise>
                         </c:choose>
                     </strong>
                 </span>
-                <a class="btn-link" href="<c:url value='/logout'/>">Đăng xuất</a>
+                <a class="btn-link" href="<c:url value='/logout'/>">ÄÄƒng xuáº¥t</a>
             </div>
         </header>
 
-        <!-- THỐNG KÊ 4 Ô CARD -->
+        
         <section class="dashboard-cards">
             <div class="dash-card">
-                <div class="dash-card-title">TỔNG DOANH THU</div>
+                <div class="dash-card-title">Tá»”NG DOANH THU</div>
                 <div class="dash-card-value">
-                    <c:out value="${totalRevenue != null ? totalRevenue : ''}"/> đ
+                    <c:out value="${totalRevenue != null ? totalRevenue : ''}"/> Ä‘
                 </div>
-                <div class="dash-card-icon">💰</div>
+                <div class="dash-card-icon">ðŸ’°</div>
             </div>
 
             <div class="dash-card">
-                <div class="dash-card-title">ĐƠN HÀNG MỚI</div>
+                <div class="dash-card-title">ÄÆ N HÃ€NG Má»šI</div>
                 <div class="dash-card-value">
                     <c:out value="${newOrdersCount != null ? newOrdersCount : ''}"/>
                 </div>
-                <div class="dash-card-icon">🛒</div>
+                <div class="dash-card-icon">ðŸ›’</div>
             </div>
 
             <div class="dash-card">
-                <div class="dash-card-title">SẢN PHẨM</div>
+                <div class="dash-card-title">Sáº¢N PHáº¨M</div>
                 <div class="dash-card-value">
                     <c:out value="${productCount != null ? productCount : ''}"/>
                 </div>
-                <div class="dash-card-icon">💻</div>
+                <div class="dash-card-icon">ðŸ’»</div>
             </div>
 
             <div class="dash-card">
-                <div class="dash-card-title">KHÁCH HÀNG</div>
+                <div class="dash-card-title">KHÃCH HÃ€NG</div>
                 <div class="dash-card-value">
                     <c:out value="${customerCount != null ? customerCount : ''}"/>
                 </div>
-                <div class="dash-card-icon">👤</div>
+                <div class="dash-card-icon">ðŸ‘¤</div>
             </div>
         </section>
 
-        <!-- BẢNG ĐƠN HÀNG CẦN XỬ LÝ -->
+        
         <section class="card">
             <div class="card-header">
-                <div class="card-title">Đơn hàng cần xử lý (Mới nhất)</div>
-                <a href="<c:url value='/admin/orders'/>" class="btn btn-primary">Xem tất cả</a>
+                <div class="card-title">ÄÆ¡n hÃ ng cáº§n xá»­ lÃ½ (Má»›i nháº¥t)</div>
+                <a href="<c:url value='/admin/orders'/>" class="btn btn-primary">Xem táº¥t cáº£</a>
             </div>
 
             <div class="table-wrapper">
                 <table class="product-table">
                     <thead>
                     <tr>
-                        <th style="width:80px;">Mã đơn</th>
-                        <th>Khách hàng</th>
-                        <th style="width:180px;">Tổng tiền</th>
-                        <th style="width:140px;">Trạng thái</th>
-                        <th style="width:160px;">Ngày đặt</th>
-                        <th style="width:120px;">Hành động</th>
+                        <th style="width:80px;">MÃ£ Ä‘Æ¡n</th>
+                        <th>KhÃ¡ch hÃ ng</th>
+                        <th style="width:180px;">Tá»•ng tiá»n</th>
+                        <th style="width:140px;">Tráº¡ng thÃ¡i</th>
+                        <th style="width:160px;">NgÃ y Ä‘áº·t</th>
+                        <th style="width:120px;">HÃ nh Ä‘á»™ng</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -122,7 +122,7 @@
                             <td>#<c:out value="${o.id}"/></td>
                             <td><c:out value="${o.customerName}"/></td>
                             <td class="price-current">
-                                <c:out value="${o.totalAmount}"/> đ
+                                <c:out value="${o.totalAmount}"/> Ä‘
                             </td>
                             <td>
                                 <span class="badge status-${o.status}">
@@ -133,7 +133,7 @@
                             <td>
                                 <a href="${pageContext.request.contextPath}/admin/orders?action=detail&id=${o.id}"
                                    class="btn btn-secondary">
-                                    Chi tiết
+                                    Chi tiáº¿t
                                 </a>
                             </td>
                         </tr>
@@ -142,7 +142,7 @@
                     <c:if test="${empty latestOrders}">
                         <tr>
                             <td colspan="6" class="text-center text-muted">
-                                Chưa có đơn hàng nào cần xử lý.
+                                ChÆ°a cÃ³ Ä‘Æ¡n hÃ ng nÃ o cáº§n xá»­ lÃ½.
                             </td>
                         </tr>
                     </c:if>
@@ -156,3 +156,5 @@
 
 </body>
 </html>
+
+

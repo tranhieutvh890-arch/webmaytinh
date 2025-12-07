@@ -1,4 +1,4 @@
-var STATIC_BASE = '';
+﻿var STATIC_BASE = '';
 var CONTEXT_BASE = '/';
 var HOME_URL = '/';
 
@@ -54,7 +54,7 @@ function renderCart() {
     var item = cart[i];
     var imgSrc = item.image ? toAbsoluteUrl(item.image) : (STATIC_BASE + 'images/no-image.svg');
     var oldPriceHtml = item.oldPrice
-      ? '<span class="original-price">' + Number(item.oldPrice).toLocaleString('vi-VN') + '₫</span>'
+      ? '<span class="original-price">' + Number(item.oldPrice).toLocaleString('vi-VN') + 'â‚«</span>'
       : '';
 
     var cartItemHtml =
@@ -67,12 +67,12 @@ function renderCart() {
                ' onerror="this.onerror=null;this.src=\'' + STATIC_BASE + 'images/no-image.svg\';">' +
           '<div class="item-details">' +
             '<h3>' + (item.name || '') + '</h3>' +
-            '<div class="item-variant"><span>Phân Loại: ' + (item.variant || '-') + '</span></div>' +
+            '<div class="item-variant"><span>PhÃ¢n Loáº¡i: ' + (item.variant || '-') + '</span></div>' +
           '</div>' +
         '</div>' +
         '<div class="item-price">' +
           oldPriceHtml +
-          '<span class="current-price">' + Number(item.price || 0).toLocaleString('vi-VN') + '₫</span>' +
+          '<span class="current-price">' + Number(item.price || 0).toLocaleString('vi-VN') + 'â‚«</span>' +
         '</div>' +
         '<div class="quantity-controls">' +
           '<button class="qty-btn" onclick="updateQuantity(\'' + (item.id || '') + '\', -1)">-</button>' +
@@ -80,9 +80,9 @@ function renderCart() {
                  'onchange="updateQuantity(\'' + (item.id || '') + '\', 0, this.value)">' +
           '<button class="qty-btn" onclick="updateQuantity(\'' + (item.id || '') + '\', 1)">+</button>' +
         '</div>' +
-        '<div class="item-total">' + Number((item.price || 0) * (item.quantity || 1)).toLocaleString('vi-VN') + '₫</div>' +
+        '<div class="item-total">' + Number((item.price || 0) * (item.quantity || 1)).toLocaleString('vi-VN') + 'â‚«</div>' +
         '<div class="item-actions">' +
-          '<button class="remove-btn" onclick="removeItem(\'' + (item.id || '') + '\')">Xóa</button>' +
+          '<button class="remove-btn" onclick="removeItem(\'' + (item.id || '') + '\')">XÃ³a</button>' +
         '</div>' +
       '</div>';
 
@@ -94,7 +94,7 @@ function renderCart() {
 
 function showEmptyCart() {
   var shopSection = document.querySelector('.shop-section');
-  shopSection.innerHTML = '<div style="text-align:center;padding:40px;color:#999;"><p>Giỏ hàng của bạn trống</p><a href="' + HOME_URL + '" style="color:#007bff;text-decoration:none;">← Quay lại mua sắm</a></div>';
+  shopSection.innerHTML = '<div style="text-align:center;padding:40px;color:#999;"><p>Giá» hÃ ng cá»§a báº¡n trá»‘ng</p><a href="' + HOME_URL + '" style="color:#007bff;text-decoration:none;">â† Quay láº¡i mua sáº¯m</a></div>';
   
   var cartHeader = document.querySelector('.cart-header');
   var cartFooter = document.querySelector('.cart-footer');
@@ -111,8 +111,8 @@ function updateCartTotal() {
 
   var totalEl = document.querySelector('.total-amount');
   var countEl = document.querySelector('.total-section span');
-  if (totalEl) totalEl.textContent = Number(total).toLocaleString('vi-VN') + '₫';
-  if (countEl) countEl.textContent = 'Tổng thanh toán (' + cart.length + ' sản phẩm):';
+  if (totalEl) totalEl.textContent = Number(total).toLocaleString('vi-VN') + 'â‚«';
+  if (countEl) countEl.textContent = 'Tá»•ng thanh toÃ¡n (' + cart.length + ' sáº£n pháº©m):';
 
   var checkboxes = document.querySelectorAll('.cart-item .checkbox input[type="checkbox"]');
   var anyChecked = false;
@@ -150,7 +150,7 @@ function updateQuantity(itemId, delta, newValue) {
 }
 
 function removeItem(itemId) {
-  if (!confirm('Bạn chắc chắn muốn xóa sản phẩm này?')) return;
+  if (!confirm('Báº¡n cháº¯c cháº¯n muá»‘n xÃ³a sáº£n pháº©m nÃ y?')) return;
   var cart = JSON.parse(localStorage.getItem('cart')) || [];
   var filtered = [];
   for (var i = 0; i < cart.length; i++) {
@@ -171,11 +171,11 @@ function removeSelectedItems() {
   }
 
   if (idsToRemove.length === 0) {
-    alert('Vui lòng chọn sản phẩm để xóa');
+    alert('Vui lÃ²ng chá»n sáº£n pháº©m Ä‘á»ƒ xÃ³a');
     return;
   }
 
-  if (!confirm('Bạn chắc chắn muốn xóa ' + idsToRemove.length + ' sản phẩm?')) return;
+  if (!confirm('Báº¡n cháº¯c cháº¯n muá»‘n xÃ³a ' + idsToRemove.length + ' sáº£n pháº©m?')) return;
 
   var cart = JSON.parse(localStorage.getItem('cart')) || [];
   var filtered = [];
@@ -243,3 +243,4 @@ function initLoginModal() {
     if (e.key === 'Escape') close();
   });
 }
+

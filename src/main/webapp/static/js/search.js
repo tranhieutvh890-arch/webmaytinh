@@ -1,4 +1,4 @@
-function handleSearch(event) {
+﻿function handleSearch(event) {
   try {
     if (event && event.preventDefault) event.preventDefault();
     var searchInput = document.getElementById('searchInput') || {};
@@ -132,3 +132,4 @@ function createCategoryResults() {
 }
 
 window.handleSearch = handleSearch;
+

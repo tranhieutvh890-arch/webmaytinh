@@ -1,4 +1,4 @@
-/* ================= Product Detail Styles ================= */
+﻿
 
 .product-detail { 
   padding: var(--s4) 0; 
@@ -118,7 +118,7 @@
   margin-top: var(--s2); 
 }
 
-/* Cart notification */
+
 .cart-notification { 
   position: fixed; 
   bottom: 20px; 
@@ -148,7 +148,7 @@
   font-size: 20px; 
 }
 
-/* Responsive */
+
 @media (max-width: 768px) {
   .product-grid { 
     grid-template-columns: 1fr; 
@@ -166,3 +166,4 @@
     flex-direction: column; 
   }
 }
+

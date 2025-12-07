@@ -1,4 +1,4 @@
-function updateCartCount() {
+﻿function updateCartCount() {
     var cartStr = localStorage.getItem("cart");
     var cart = cartStr ? JSON.parse(cartStr) : [];
     var totalItems = 0;
@@ -128,7 +128,7 @@ function initAuthModal() {
                 }
             }).catch(function () {
                 if (errorDiv) {
-                    errorDiv.textContent = "❌ Sai tên đăng nhập hoặc mật khẩu!";
+                    errorDiv.textContent = "âŒ Sai tÃªn Ä‘Äƒng nháº­p hoáº·c máº­t kháº©u!";
                     errorDiv.style.display = "block";
                 }
             });
@@ -158,19 +158,19 @@ function initAuthModal() {
             }).then(function (result) {
                 if (result.ok) {
                     if (ok) {
-                        ok.textContent = "🎉 Đăng ký thành công! Bạn có thể đăng nhập ngay.";
+                        ok.textContent = "ðŸŽ‰ ÄÄƒng kÃ½ thÃ nh cÃ´ng! Báº¡n cÃ³ thá»ƒ Ä‘Äƒng nháº­p ngay.";
                         ok.style.display = "block";
                     }
                     registerRealForm.reset();
                 } else {
                     if (err) {
-                        err.textContent = result.msg || "❌ Tên đăng nhập đã tồn tại hoặc dữ liệu không hợp lệ.";
+                        err.textContent = result.msg || "âŒ TÃªn Ä‘Äƒng nháº­p Ä‘Ã£ tá»“n táº¡i hoáº·c dá»¯ liá»‡u khÃ´ng há»£p lá»‡.";
                         err.style.display = "block";
                     }
                 }
             }).catch(function (e2) {
                 if (err) {
-                    err.textContent = "❌ Lỗi kết nối: " + e2;
+                    err.textContent = "âŒ Lá»—i káº¿t ná»‘i: " + e2;
                     err.style.display = "block";
                 }
             });
@@ -181,7 +181,7 @@ function initAuthModal() {
 function initBannerSlider() {
     var wrapper  = document.querySelector(".banner-wrapper");
     if (!wrapper) {
-        console.log("Không tìm thấy .banner-wrapper");
+        console.log("KhÃ´ng tÃ¬m tháº¥y .banner-wrapper");
         return;
     }
 
@@ -192,7 +192,7 @@ function initBannerSlider() {
     var totalSlides = slides.length;
 
     if (totalSlides === 0) {
-        console.log("Không có slide nào");
+        console.log("KhÃ´ng cÃ³ slide nÃ o");
         return;
     }
 
@@ -255,7 +255,7 @@ function initBannerSlider() {
     updateSlide();
     startAuto();
 
-    console.log("initBannerSlider chạy xong, totalSlides =", totalSlides);
+    console.log("initBannerSlider cháº¡y xong, totalSlides =", totalSlides);
 }
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -263,3 +263,4 @@ document.addEventListener("DOMContentLoaded", function() {
     initAuthModal();
     initBannerSlider();
 });
+

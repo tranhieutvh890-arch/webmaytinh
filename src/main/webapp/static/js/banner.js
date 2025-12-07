@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function () {
+﻿document.addEventListener("DOMContentLoaded", function () {
     var wrapper  = document.querySelector(".banner-wrapper");
     if (!wrapper) return;
 
@@ -63,3 +63,4 @@ document.addEventListener("DOMContentLoaded", function () {
     updateSlide();
     startAuto();
 });
+

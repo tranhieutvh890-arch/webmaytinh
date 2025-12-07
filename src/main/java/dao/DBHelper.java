@@ -1,11 +1,8 @@
-package dao;
-
+﻿package dao;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-
 public class DBHelper {
-
     private static final String URL =
             "jdbc:mysql://localhost:3306/laptop4study"
             + "?useSSL=false"
@@ -13,36 +10,30 @@ public class DBHelper {
             + "&serverTimezone=UTC"
             + "&useUnicode=true"
             + "&characterEncoding=UTF-8";
-
     private static final String USER = "root";       
     private static final String PASS = "12052002";   
-
     static {
         try {
-            // Nạp driver MySQL
             Class.forName("com.mysql.cj.jdbc.Driver");
-            System.out.println("✅ MySQL JDBC Driver Loaded!");
+            System.out.println("âœ… MySQL JDBC Driver Loaded!");
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException("❌ Không load được MySQL Driver!", e);
+            throw new RuntimeException("âŒ KhÃ´ng load Ä‘Æ°á»£c MySQL Driver!", e);
         }
     }
-
     public static Connection getConnection() {
         try {
             return DriverManager.getConnection(URL, USER, PASS);
         } catch (SQLException e) {
-            System.out.println("❌ Lỗi kết nối MySQL: " + e.getMessage());
+            System.out.println("âŒ Lá»—i káº¿t ná»‘i MySQL: " + e.getMessage());
             return null;
         }
     }
-
-    // Test nhanh trong Eclipse
     public static void main(String[] args) {
         Connection conn = getConnection();
         if (conn != null) {
-            System.out.println("✅ Kết nối thành công MySQL!");
+            System.out.println("âœ… Káº¿t ná»‘i thÃ nh cÃ´ng MySQL!");
         } else {
-            System.out.println("❌ Kết nối thất bại!");
+            System.out.println("âŒ Káº¿t ná»‘i tháº¥t báº¡i!");
         }
     }
 }
