@@ -1,42 +1,78 @@
-// Cart utilities
+// ================= Cart Utilities =================
+
 function updateCartCount() {
-  const cart = JSON.parse(localStorage.getItem('cart')) || [];
-  const total = cart.reduce((s, i) => s + (i.quantity || 0), 0);
-  const badge = document.getElementById('cartCount');
+  var cart = JSON.parse(localStorage.getItem('cart')) || [];
+  var total = 0;
+  for (var i = 0; i < cart.length; i++) {
+    total += (cart[i].quantity || 0);
+  }
+  var badge = document.getElementById('cartCount');
   if (!badge) return total;
-  if (total > 0) { badge.textContent = total; badge.style.display = 'flex'; }
-  else { badge.textContent = '0'; badge.style.display = 'none'; }
+  if (total > 0) {
+    badge.textContent = total;
+    badge.style.display = 'flex';
+  } else {
+    badge.textContent = '0';
+    badge.style.display = 'none';
+  }
   return total;
 }
 
 function showNotification() {
-  const n = document.getElementById('cartNotification');
+  var n = document.getElementById('cartNotification');
   if (!n) return;
   n.classList.add('show');
-  setTimeout(() => n.classList.remove('show'), 2000);
+  setTimeout(function() {
+    n.classList.remove('show');
+  }, 2000);
 }
 
 function addToCart(product) {
-  let cart = JSON.parse(localStorage.getItem('cart')) || [];
-  const ex = cart.find(i => i.id === product.id);
-  if (ex) ex.quantity = (ex.quantity || 1) + (product.quantity || 1);
-  else cart.push({...product, quantity: product.quantity || 1});
+  var cart = JSON.parse(localStorage.getItem('cart')) || [];
+  var ex = null;
+  for (var i = 0; i < cart.length; i++) {
+    if (cart[i].id === product.id) {
+      ex = cart[i];
+      break;
+    }
+  }
+  if (ex) {
+    ex.quantity = (ex.quantity || 1) + (product.quantity || 1);
+  } else {
+    var newItem = {};
+    for (var key in product) {
+      if (product.hasOwnProperty(key)) {
+        newItem[key] = product[key];
+      }
+    }
+    newItem.quantity = product.quantity || 1;
+    cart.push(newItem);
+  }
   localStorage.setItem('cart', JSON.stringify(cart));
   updateCartCount();
   showNotification();
 }
 
 function removeFromCart(id) {
-  let cart = JSON.parse(localStorage.getItem('cart')) || [];
-  cart = cart.filter(i => i.id !== id);
-  localStorage.setItem('cart', JSON.stringify(cart));
+  var cart = JSON.parse(localStorage.getItem('cart')) || [];
+  var filtered = [];
+  for (var i = 0; i < cart.length; i++) {
+    if (cart[i].id !== id) {
+      filtered.push(cart[i]);
+    }
+  }
+  localStorage.setItem('cart', JSON.stringify(filtered));
   updateCartCount();
 }
 
 function updateCartQuantity(id, qty) {
-  let cart = JSON.parse(localStorage.getItem('cart')) || [];
-  const item = cart.find(i => i.id === id);
-  if (item) item.quantity = Math.max(1, qty);
+  var cart = JSON.parse(localStorage.getItem('cart')) || [];
+  for (var i = 0; i < cart.length; i++) {
+    if (cart[i].id === id) {
+      cart[i].quantity = Math.max(1, qty);
+      break;
+    }
+  }
   localStorage.setItem('cart', JSON.stringify(cart));
   updateCartCount();
 }
@@ -45,11 +81,12 @@ function getCart() {
   return JSON.parse(localStorage.getItem('cart')) || [];
 }
 
-// Product Detail Page
+// ================= Product Detail Page =================
+
 function updateQuantity(change) {
-  const input = document.getElementById('quantity');
+  var input = document.getElementById('quantity');
   if (!input) return;
-  const newVal = Math.max(1, (parseInt(input.value) || 1) + change);
+  var newVal = Math.max(1, (parseInt(input.value) || 1) + change);
   input.value = newVal;
 }
 
@@ -58,7 +95,7 @@ function addToCartFromDetail() {
   var quantity = qtyInput ? parseInt(qtyInput.value) || 1 : 1;
   if (quantity < 1) return;
   
-  // Lấy thông tin từ page
+  // Get product info from page
   var h1 = document.querySelector('.product-info h1');
   var productName = h1 ? h1.textContent : 'Sản phẩm';
   
@@ -69,7 +106,7 @@ function addToCartFromDetail() {
   var mainImg = document.getElementById('mainImage');
   var image = mainImg ? mainImg.src : '/static/images/placeholder.png';
   
-  // URL sản phẩm từ URL hiện tại
+  // Get product ID from URL
   var urlParams = new URLSearchParams(window.location.search);
   var productId = 'sp' + (urlParams.get('id') || Date.now());
   var detailUrl = window.location.href;
@@ -84,12 +121,13 @@ function addToCartFromDetail() {
   });
 }
 
-// Initialize on page load
+// ================= Initialize =================
+
 document.addEventListener('DOMContentLoaded', function() {
   updateCartCount();
   
-  // Nếu có nút add to cart
-  const addBtn = document.querySelector('.buy-btn');
+  // Add event listener to buy button if exists
+  var addBtn = document.querySelector('.buy-btn');
   if (addBtn) {
     addBtn.addEventListener('click', addToCartFromDetail);
   }
