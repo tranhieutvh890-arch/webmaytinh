@@ -7,7 +7,7 @@ import java.util.List;
 
 public class ProductDAO {
 
-    /* ===================== MAP ResultSet -> Product ===================== */
+    /* ================= MAP ResultSet -> Product ================= */
     private Product map(ResultSet rs) throws SQLException {
         Product p = new Product();
         p.setMaSanPham(rs.getInt("MaSanPham"));
@@ -26,15 +26,13 @@ public class ProductDAO {
         p.setNgayCapNhat(rs.getTimestamp("NgayCapNhat") != null ? rs.getTimestamp("NgayCapNhat").toLocalDateTime() : null);
         p.setTrangThai(rs.getBoolean("TrangThai"));
 
-        // Field view Join (try/catch to avoid errors if not available)
         try { p.setTenDanhMuc(rs.getString("TenDanhMuc")); } catch (Exception ignored) {}
         try { p.setTenThuongHieu(rs.getString("TenThuongHieu")); } catch (Exception ignored) {}
 
         return p;
     }
 
-
-    /* ===================== CREATE ===================== */
+    /* ================= INSERT SẢN PHẨM ================= */
     public int create(Product p) throws Exception {
         String sql = """
                 INSERT INTO SanPham
@@ -47,6 +45,7 @@ public class ProductDAO {
              PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setInt(1, p.getMaDanhMuc());
+
             if (p.getMaThuongHieu() == null) ps.setNull(2, Types.INTEGER);
             else ps.setInt(2, p.getMaThuongHieu());
 
@@ -65,11 +64,18 @@ public class ProductDAO {
 
             ps.setBoolean(10, p.isSanPhamCu());
 
-            if (p.getAnhDaiDien() == null || p.getAnhDaiDien().trim().isEmpty())
+            // ====== LƯU NGUYÊN ĐƯỜNG DẪN ẢNH ======
+            String path = p.getAnhDaiDien();
+            if (path == null || path.trim().isEmpty()) {
                 ps.setNull(11, Types.NVARCHAR);
-            else
-                ps.setString(11, p.getAnhDaiDien());
-
+            } else {
+                path = path.trim().replace("\\", "/");
+                // nếu chỉ nhập tên file → tự thêm /static/images/
+                if (!path.contains("/")) {
+                    path = "/static/images/" + path;
+                }
+                ps.setString(11, path);
+            }
             int affected = ps.executeUpdate();
             if (affected == 0) return -1;
 
@@ -80,14 +86,13 @@ public class ProductDAO {
         }
     }
 
-
-    /* ===================== UPDATE ===================== */
+    /* ================= UPDATE SẢN PHẨM ================= */
     public boolean update(Product p) throws Exception {
         String sql = """
                 UPDATE SanPham
                 SET MaDanhMuc=?, MaThuongHieu=?, TenSanPham=?, MoTaNgan=?, MoTaChiTiet=?,
                     Gia=?, GiaCu=?, SoLuongTon=?, BaoHanhThang=?, SanPhamCu=?,
-                    AnhDaiDien=?, NgayCapNhat = SYSDATETIME()
+                    AnhDaiDien=?, NgayCapNhat = NOW()
                 WHERE MaSanPham = ?
                 """;
 
@@ -95,6 +100,7 @@ public class ProductDAO {
              PreparedStatement ps = c.prepareStatement(sql)) {
 
             ps.setInt(1, p.getMaDanhMuc());
+
             if (p.getMaThuongHieu() == null) ps.setNull(2, Types.INTEGER);
             else ps.setInt(2, p.getMaThuongHieu());
 
@@ -113,10 +119,18 @@ public class ProductDAO {
 
             ps.setBoolean(10, p.isSanPhamCu());
 
-            if (p.getAnhDaiDien() == null || p.getAnhDaiDien().trim().isEmpty())
-                ps.setNull(11, Types.NVARCHAR);
-            else
-                ps.setString(11, p.getAnhDaiDien());
+            // ====== LƯU GIỐNG HÀM create(): FULL PATH /static/images/... ======
+            String path = p.getAnhDaiDien();
+            if (path == null || path.trim().isEmpty()) {
+                ps.setNull(11, Types.VARCHAR);
+            } else {
+                path = path.trim().replace("\\", "/");
+                // nếu chỉ là tên file → tự thêm /static/images/
+                if (!path.contains("/")) {
+                    path = "/static/images/" + path;
+                }
+                ps.setString(11, path);
+            }
 
             ps.setInt(12, p.getMaSanPham());
 
@@ -124,8 +138,7 @@ public class ProductDAO {
         }
     }
 
-
-    /* ===================== DELETE ===================== */
+    /* ================= DELETE ================= */
     public boolean delete(int maSanPham) throws Exception {
         String sql = "DELETE FROM SanPham WHERE MaSanPham = ?";
         try (Connection c = DBHelper.getConnection();
@@ -136,82 +149,45 @@ public class ProductDAO {
         }
     }
 
-
-    /* ===================== FIND ALL ===================== */
+    /* ================= FIND ALL ================= */
     public List<Product> findAll() throws Exception {
         List<Product> list = new ArrayList<>();
 
         String sql = """
-            SELECT 
-                sp.MaSanPham,
-                sp.MaDanhMuc,
-                sp.MaThuongHieu,
-                sp.TenSanPham,
-                sp.MoTaNgan,
-                sp.MoTaChiTiet,
-                sp.Gia,
-                sp.GiaCu,
-                sp.SoLuongTon,
-                sp.BaoHanhThang,
-                sp.SanPhamCu,
-                -- 👉 ẢNH LẤY TỪ AnhSanPham, alias thành AnhDaiDien
-                a.DuongDanAnh AS AnhDaiDien,
-                sp.NgayTao,
-                sp.NgayCapNhat,
-                sp.TrangThai,
-                dm.TenDanhMuc,
-                th.TenThuongHieu
-            FROM SanPham sp
-            LEFT JOIN DanhMuc dm ON dm.MaDanhMuc = sp.MaDanhMuc
-            LEFT JOIN ThuongHieu th ON th.MaThuongHieu = sp.MaThuongHieu
-            LEFT JOIN AnhSanPham a 
-                   ON a.MaSanPham = sp.MaSanPham
-                  AND a.LaAnhChinh = 1   -- chỉ lấy ảnh chính
-            ORDER BY sp.MaSanPham DESC
-            """;
+                SELECT
+                    sp.MaSanPham, sp.MaDanhMuc, sp.MaThuongHieu, sp.TenSanPham, sp.MoTaNgan,
+                    sp.MoTaChiTiet, sp.Gia, sp.GiaCu, sp.SoLuongTon, sp.BaoHanhThang,
+                    sp.SanPhamCu, sp.AnhDaiDien, sp.NgayTao, sp.NgayCapNhat, sp.TrangThai,
+                    dm.TenDanhMuc, th.TenThuongHieu
+                FROM SanPham sp
+                LEFT JOIN DanhMuc dm ON dm.MaDanhMuc = sp.MaDanhMuc
+                LEFT JOIN ThuongHieu th ON th.MaThuongHieu = sp.MaThuongHieu
+                ORDER BY sp.MaSanPham DESC
+                """;
 
         try (Connection c = DBHelper.getConnection();
              PreparedStatement ps = c.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
-            while (rs.next()) {
-                list.add(map(rs)); // map() vẫn dùng column AnhDaiDien như cũ
-            }
+            while (rs.next()) list.add(map(rs));
         }
+
         return list;
     }
 
-
-    /* ===================== FIND BY ID ===================== */
+    /* ================= FIND BY ID ================= */
     public Product findById(int maSanPham) throws Exception {
-
         String sql = """
-            SELECT 
-                sp.MaSanPham,
-                sp.MaDanhMuc,
-                sp.MaThuongHieu,
-                sp.TenSanPham,
-                sp.MoTaNgan,
-                sp.MoTaChiTiet,
-                sp.Gia,
-                sp.GiaCu,
-                sp.SoLuongTon,
-                sp.BaoHanhThang,
-                sp.SanPhamCu,
-                a.DuongDanAnh AS AnhDaiDien,   -- ảnh từ AnhSanPham
-                sp.NgayTao,
-                sp.NgayCapNhat,
-                sp.TrangThai,
-                dm.TenDanhMuc,
-                th.TenThuongHieu
-            FROM SanPham sp
-            LEFT JOIN DanhMuc dm ON dm.MaDanhMuc = sp.MaDanhMuc
-            LEFT JOIN ThuongHieu th ON th.MaThuongHieu = sp.MaThuongHieu
-            LEFT JOIN AnhSanPham a 
-                   ON a.MaSanPham = sp.MaSanPham
-                  AND a.LaAnhChinh = 1
-            WHERE sp.MaSanPham = ?
-            """;
+                SELECT
+                    sp.MaSanPham, sp.MaDanhMuc, sp.MaThuongHieu, sp.TenSanPham, sp.MoTaNgan,
+                    sp.MoTaChiTiet, sp.Gia, sp.GiaCu, sp.SoLuongTon, sp.BaoHanhThang,
+                    sp.SanPhamCu, sp.AnhDaiDien, sp.NgayTao, sp.NgayCapNhat, sp.TrangThai,
+                    dm.TenDanhMuc, th.TenThuongHieu
+                FROM SanPham sp
+                LEFT JOIN DanhMuc dm ON dm.MaDanhMuc = sp.MaDanhMuc
+                LEFT JOIN ThuongHieu th ON th.MaThuongHieu = sp.MaThuongHieu
+                WHERE sp.MaSanPham = ?
+                """;
 
         try (Connection c = DBHelper.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
@@ -219,12 +195,9 @@ public class ProductDAO {
             ps.setInt(1, maSanPham);
 
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return map(rs);
-                }
+                if (rs.next()) return map(rs);
             }
         }
         return null;
     }
-
 }

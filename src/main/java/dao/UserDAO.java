@@ -132,4 +132,160 @@ public class UserDAO {
     public boolean validateLogin(String tenDangNhap, String plainPassword) throws Exception {
         return login(tenDangNhap, plainPassword) != null;
     }
+    /* =====================================================
+    LẤY USER THEO ID
+    ===================================================== */
+ public User findById(int id) throws Exception {
+     String sql = """
+             SELECT 
+                 nd.MaNguoiDung,
+                 nd.TenDangNhap,
+                 nd.MatKhau,
+                 nd.HoTen,
+                 nd.Email,
+                 nd.SoDienThoai,
+                 nd.MaQuyen,
+                 nd.NgayTao,
+                 nd.TrangThai,
+                 q.TenQuyen
+             FROM NguoiDung nd
+             JOIN Quyen q ON nd.MaQuyen = q.MaQuyen
+             WHERE nd.MaNguoiDung = ?
+             """;
+
+     try (Connection c = DBHelper.getConnection();
+          PreparedStatement ps = c.prepareStatement(sql)) {
+
+         ps.setInt(1, id);
+
+         try (ResultSet rs = ps.executeQuery()) {
+             if (rs.next()) {
+                 User u = new User();
+                 u.setMaNguoiDung(rs.getInt("MaNguoiDung"));
+                 u.setTenDangNhap(rs.getString("TenDangNhap"));
+                 u.setMatKhau(rs.getString("MatKhau"));
+                 u.setHoTen(rs.getString("HoTen"));
+                 u.setEmail(rs.getString("Email"));
+                 u.setSoDienThoai(rs.getString("SoDienThoai"));
+                 u.setMaQuyen(rs.getInt("MaQuyen"));
+                 Timestamp ts = rs.getTimestamp("NgayTao");
+                 u.setNgayTao(ts != null ? ts.toLocalDateTime() : null);
+                 u.setTrangThai(rs.getBoolean("TrangThai"));
+                 u.setTenQuyen(rs.getString("TenQuyen"));
+                 return u;
+             }
+         }
+     }
+     return null;
+ }
+
+ /* =====================================================
+    PHÂN TRANG: ĐẾM TỔNG SỐ USER
+    ===================================================== */
+ public int countAll() throws Exception {
+     String sql = "SELECT COUNT(*) FROM NguoiDung";
+     try (Connection c = DBHelper.getConnection();
+          PreparedStatement ps = c.prepareStatement(sql);
+          ResultSet rs = ps.executeQuery()) {
+
+         if (rs.next()) {
+             return rs.getInt(1);
+         }
+     }
+     return 0;
+ }
+
+ /* =====================================================
+ PHÂN TRANG: LẤY DANH SÁCH USER
+ (offset = (page-1)*pageSize)
+ ===================================================== */
+public java.util.List<User> findAll(int offset, int limit) throws Exception {
+  java.util.List<User> list = new java.util.ArrayList<>();
+
+  // ✅ DÙNG CÚ PHÁP MySQL: LIMIT offset, count
+  String sql = """
+          SELECT 
+              nd.MaNguoiDung,
+              nd.TenDangNhap,
+              nd.MatKhau,
+              nd.HoTen,
+              nd.Email,
+              nd.SoDienThoai,
+              nd.MaQuyen,
+              nd.NgayTao,
+              nd.TrangThai,
+              q.TenQuyen
+          FROM NguoiDung nd
+          JOIN Quyen q ON nd.MaQuyen = q.MaQuyen
+          ORDER BY nd.MaNguoiDung DESC
+          LIMIT ?, ?
+          """;
+
+  try (Connection c = DBHelper.getConnection();
+       PreparedStatement ps = c.prepareStatement(sql)) {
+
+      // offset = bỏ qua bao nhiêu dòng, limit = lấy bao nhiêu dòng
+      ps.setInt(1, offset);   // ví dụ (page-1)*pageSize
+      ps.setInt(2, limit);    // ví dụ pageSize
+
+      try (ResultSet rs = ps.executeQuery()) {
+          while (rs.next()) {
+              User u = new User();
+              u.setMaNguoiDung(rs.getInt("MaNguoiDung"));
+              u.setTenDangNhap(rs.getString("TenDangNhap"));
+              u.setMatKhau(rs.getString("MatKhau"));
+              u.setHoTen(rs.getString("HoTen"));
+              u.setEmail(rs.getString("Email"));
+              u.setSoDienThoai(rs.getString("SoDienThoai"));
+              u.setMaQuyen(rs.getInt("MaQuyen"));
+              Timestamp ts = rs.getTimestamp("NgayTao");
+              u.setNgayTao(ts != null ? ts.toLocalDateTime() : null);
+              u.setTrangThai(rs.getBoolean("TrangThai"));
+              u.setTenQuyen(rs.getString("TenQuyen"));
+
+              list.add(u);
+          }
+      }
+  }
+  return list;
+}
+
+ /* =====================================================
+    CẬP NHẬT THÔNG TIN USER (KHÔNG ĐỔI MẬT KHẨU)
+    ===================================================== */
+ public boolean updateUser(User u) throws Exception {
+     String sql = """
+             UPDATE NguoiDung
+             SET HoTen = ?, Email = ?, SoDienThoai = ?, MaQuyen = ?, TrangThai = ?
+             WHERE MaNguoiDung = ?
+             """;
+
+     try (Connection c = DBHelper.getConnection();
+          PreparedStatement ps = c.prepareStatement(sql)) {
+
+         ps.setString(1, u.getHoTen());
+         ps.setString(2, u.getEmail());
+         ps.setString(3, u.getSoDienThoai());
+         ps.setInt(4, u.getMaQuyen());
+         ps.setBoolean(5, u.isTrangThai());
+         ps.setInt(6, u.getMaNguoiDung());
+
+         return ps.executeUpdate() > 0;
+     }
+ }
+
+ /* =====================================================
+    XÓA USER
+    ===================================================== */
+ public boolean deleteUser(int id) throws Exception {
+     String sql = "DELETE FROM NguoiDung WHERE MaNguoiDung = ?";
+
+     try (Connection c = DBHelper.getConnection();
+          PreparedStatement ps = c.prepareStatement(sql)) {
+
+         ps.setInt(1, id);
+         return ps.executeUpdate() > 0;
+     }
+ }
+
 }

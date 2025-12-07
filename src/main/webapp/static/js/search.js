@@ -6,15 +6,40 @@ function handleSearch(event) {
     const searchTerm = raw.trim().toLowerCase();
     if (!searchTerm) return false;
 
+    console.log('🔍 Tìm kiếm:', searchTerm); // Debug
+
     const products = document.querySelectorAll('article.card, .product-item');
     let productMatches = 0;
 
     products.forEach(product => {
-      const titleEl = product.querySelector('.card__title, .product-name');
-      const productName = (titleEl && titleEl.textContent ? titleEl.textContent : '').toLowerCase();
+      // Lấy tên sản phẩm từ link tiêu đề
+      const titleEl = product.querySelector('a.card__title, .card__title, .product-name');
+      let productName = '';
+      
+      if (titleEl && titleEl.textContent) {
+        // Normalize: trim, lowercase, xóa dấu cách thừa
+        productName = titleEl.textContent
+          .trim()
+          .replace(/\s+/g, ' ')  // Xóa khoảng trắng thừa
+          .toLowerCase();
+      }
+      
+      // Lấy danh mục (nếu có)
       const catEl = product.querySelector('.product-category');
-      const productCategory = (catEl && catEl.textContent ? catEl.textContent : '').toLowerCase();
+      let productCategory = '';
+      if (catEl && catEl.textContent) {
+        productCategory = catEl.textContent
+          .trim()
+          .replace(/\s+/g, ' ')
+          .toLowerCase();
+      }
 
+      // Debug: hiển thị tên sản phẩm được tìm thấy
+      if (productName.length > 0) {
+        console.log('  📦', productName);
+      }
+
+      // So sánh (không phân biệt chữ hoa/thường)
       if (productName.includes(searchTerm) || productCategory.includes(searchTerm)) {
         product.style.display = '';
         productMatches++;
@@ -23,8 +48,16 @@ function handleSearch(event) {
       }
     });
 
+    console.log('✅ Tìm thấy:', productMatches, 'sản phẩm'); // Debug
+
     const catLinks = Array.from(document.querySelectorAll('.catbar a.cat'));
-    const matchedCats = catLinks.filter(a => (a.textContent || '').toLowerCase().includes(searchTerm));
+    const matchedCats = catLinks.filter(a => 
+      (a.textContent || '')
+        .trim()
+        .replace(/\s+/g, ' ')
+        .toLowerCase()
+        .includes(searchTerm)
+    );
 
     const resultsEl = document.getElementById('searchResults') || createSearchResults();
     const catsEl = document.getElementById('categoryMatches') || createCategoryResults();
@@ -59,9 +92,11 @@ function handleSearch(event) {
       catsEl.style.display = 'none';
     }
 
+    // Nếu không tìm thấy sản phẩm nhưng có 1 danh mục khớp, chuyển hướng
     if (productMatches === 0 && matchedCats.length === 1) {
       const href = matchedCats[0].getAttribute('href');
       if (href) {
+        console.log('🔄 Chuyển hướng đến:', href);
         window.location.href = href;
         return false;
       }
@@ -69,7 +104,7 @@ function handleSearch(event) {
 
     return false;
   } catch (err) {
-    console.error('Search error', err);
+    console.error('❌ Lỗi tìm kiếm:', err);
     const r = document.getElementById('searchResults') || createSearchResults();
     r.textContent = 'Lỗi tìm kiếm: ' + (err && err.message ? err.message : String(err));
     r.style.display = 'block';

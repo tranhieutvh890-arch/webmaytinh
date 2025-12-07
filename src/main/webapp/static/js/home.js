@@ -1,5 +1,5 @@
 // =======================
-//  Giỏ hàng (localStorage)
+// 1. GIỎ HÀNG (localStorage)
 // =======================
 function updateCartCount() {
     var cartStr = localStorage.getItem("cart");
@@ -33,7 +33,6 @@ function addToCart(product) {
     if (found) {
         found.quantity = (found.quantity || 0) + 1;
     } else {
-        // clone đơn giản để tránh sửa object gốc
         var newItem = {
             id: product.id,
             name: product.name,
@@ -48,26 +47,19 @@ function addToCart(product) {
     updateCartCount();
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-    updateCartCount();
-});
-
 // =======================
-//  Popup đăng nhập / đăng ký
+// 2. POPUP ĐĂNG NHẬP / ĐĂNG KÝ
 // =======================
-(function () {
+function initAuthModal() {
     var modal = document.getElementById("loginModal");
+    if (!modal) return;
+
     var loginForm = document.getElementById("loginForm");
     var registerForm = document.getElementById("registerForm");
     var showRegisterBtn = document.getElementById("showRegister");
     var showLoginBtn = document.getElementById("showLogin");
     var closeBtn = document.getElementById("loginClose");
     var triggers = document.querySelectorAll(".login-trigger");
-
-    // Nếu trang này không có modal thì thôi
-    if (!modal) {
-        return;
-    }
 
     function openModal() {
         modal.classList.add("active");
@@ -139,7 +131,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (text.indexOf("admin") !== -1 && typeof ADMIN_URL !== "undefined") {
                     window.location.href = ADMIN_URL;
                 } else {
-                    // user thường -> reload để cập nhật "Xin chào, username"
                     window.location.reload();
                 }
             }).catch(function () {
@@ -193,4 +184,105 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
     }
-})();
+}
+
+// =======================
+// 3. BANNER SLIDER TRANG CHỦ
+// =======================
+// =======================
+// 3. BANNER SLIDER TRANG CHỦ
+// =======================
+function initBannerSlider() {
+    var wrapper  = document.querySelector(".banner-wrapper");
+    if (!wrapper) {
+        console.log("Không tìm thấy .banner-wrapper");
+        return;
+    }
+
+    var slides   = document.querySelectorAll(".banner-slide");
+    var dots     = document.querySelectorAll(".dot");
+    var nextBtn  = document.querySelector(".next");
+    var prevBtn  = document.querySelector(".prev");
+    var totalSlides = slides.length;
+
+    if (totalSlides === 0) {
+        console.log("Không có slide nào");
+        return;
+    }
+
+    var currentSlide = 0;
+    var autoTimer = null;
+
+    function updateSlide() {
+        // Di chuyển wrapper
+        wrapper.style.transform = "translateX(-" + (currentSlide * 100) + "%)";
+
+        // Cập nhật dot active
+        for (var i = 0; i < dots.length; i++) {
+            if (i === currentSlide) {
+                dots[i].classList.add("active");
+            } else {
+                dots[i].classList.remove("active");
+            }
+        }
+    }
+
+    function startAuto() {
+        stopAuto();
+        autoTimer = setInterval(function () {
+            currentSlide = (currentSlide + 1) % totalSlides;
+            updateSlide();
+        }, 4000);
+    }
+
+    function stopAuto() {
+        if (autoTimer) {
+            clearInterval(autoTimer);
+            autoTimer = null;
+        }
+    }
+
+    // Nút next
+    if (nextBtn) {
+        nextBtn.addEventListener("click", function () {
+            currentSlide = (currentSlide + 1) % totalSlides;
+            updateSlide();
+            startAuto();
+        });
+    }
+
+    // Nút prev
+    if (prevBtn) {
+        prevBtn.addEventListener("click", function () {
+            currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+            updateSlide();
+            startAuto();
+        });
+    }
+
+    // Click vào dot
+    for (var j = 0; j < dots.length; j++) {
+        (function (index) {
+            dots[index].addEventListener("click", function () {
+                currentSlide = index;
+                updateSlide();
+                startAuto();
+            });
+        })(j);
+    }
+
+    // Khởi tạo lần đầu
+    updateSlide();
+    startAuto();
+
+    console.log("initBannerSlider chạy xong, totalSlides =", totalSlides);
+}
+
+// =======================
+// 4. KHỞI TẠO SAU KHI DOM SẴN SÀNG
+// =======================
+document.addEventListener("DOMContentLoaded", function () {
+    updateCartCount();
+    initAuthModal();
+    initBannerSlider();
+});

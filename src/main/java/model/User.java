@@ -7,25 +7,25 @@ public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    // ========== HẰNG SỐ PHÂN QUYỀN ==========
-    public static final int QUYEN_ADMIN    = 1;       // ví dụ: MaQuyen = 1 là ADMIN
-    public static final int QUYEN_CUSTOMER = 2;       // MaQuyen = 2 là CUSTOMER
+    
+    public static final int QUYEN_ADMIN    = 1;       
+    public static final int QUYEN_CUSTOMER = 2;      
 
-    // ========== Fields tương ứng với bảng NguoiDung ==========
-    private int maNguoiDung;          // MaNguoiDung (PK)
-    private String tenDangNhap;       // TenDangNhap
-    private transient String matKhau; // MatKhau (ẩn khi serialize)
-    private String hoTen;             // HoTen
-    private String email;             // Email
-    private String soDienThoai;       // SoDienThoai
-    private int maQuyen;              // MaQuyen (FK -> Quyen)
-    private LocalDateTime ngayTao;    // NgayTao
-    private boolean trangThai;        // TrangThai 1 = active, 0 = banned
+    
+    private int maNguoiDung;          
+    private String tenDangNhap;       
+    private transient String matKhau; 
+    private String hoTen;             
+    private String email;             
+    private String soDienThoai;       
+    private int maQuyen;              
+    private LocalDateTime ngayTao;    
+    private boolean trangThai;        
 
-    // ========== Field khi JOIN bảng QUYEN ==========
-    private String tenQuyen;          // Tên quyền: ADMIN / CUSTOMER
+    
+    private String tenQuyen;          
 
-    // ========== Constructors ==========
+    
     public User() {
     }
 
@@ -44,7 +44,7 @@ public class User implements Serializable {
         this.tenQuyen = tenQuyen;
     }
 
-    // ========== GETTER - SETTER ==========
+    
     public int getMaNguoiDung() {
         return maNguoiDung;
     }

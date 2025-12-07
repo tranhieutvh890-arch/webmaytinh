@@ -3,62 +3,46 @@ package dao;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Properties;
-import java.io.InputStream;
 
 public class DBHelper {
-    private static String url;
-    private static String user;
-    private static String pass;
-    private static String driver;
+
+    private static final String URL =
+            "jdbc:mysql://localhost:3306/laptop4study"
+            + "?useSSL=false"
+            + "&allowPublicKeyRetrieval=true"
+            + "&serverTimezone=UTC"
+            + "&useUnicode=true"
+            + "&characterEncoding=UTF-8";
+
+    private static final String USER = "root";       
+    private static final String PASS = "12052002";   
 
     static {
         try {
-            Properties props = new Properties();
-            InputStream input = DBHelper.class.getClassLoader()
-                                              .getResourceAsStream("db.properties");
-            if (input == null) {
-                throw new RuntimeException("Không tìm thấy file db.properties trong classpath!");
-            }
-            props.load(input);
-
-            url    = props.getProperty("db.url");
-            user   = props.getProperty("db.user");      // có thể null
-            pass   = props.getProperty("db.password");  // có thể null
-            driver = props.getProperty("db.driver");
-
-            Class.forName(driver);
-            System.out.println("✅ Loaded JDBC Driver: " + driver);
-            System.out.println("✅ DB URL: " + url);
-
-        } catch (Exception e) {
-            e.printStackTrace();
+            // Nạp driver MySQL
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            System.out.println("✅ MySQL JDBC Driver Loaded!");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("❌ Không load được MySQL Driver!", e);
         }
     }
 
-    // Hàm lấy Connection
-    public static Connection getConnection() throws SQLException {
-        // Nếu không khai báo user/pass -> dùng integratedSecurity
-        if ((user == null || user.isBlank()) && (pass == null || pass.isBlank())) {
-            System.out.println("🔗 Using integratedSecurity (Windows Authentication)");
-            return DriverManager.getConnection(url);
-        } else {
-            System.out.println("🔗 Using SQL login: " + user);
-            return DriverManager.getConnection(url, user, pass);
+    public static Connection getConnection() {
+        try {
+            return DriverManager.getConnection(URL, USER, PASS);
+        } catch (SQLException e) {
+            System.out.println("❌ Lỗi kết nối MySQL: " + e.getMessage());
+            return null;
         }
     }
 
-    // Test nhanh kết nối (chạy như Java Application)
+    // Test nhanh trong Eclipse
     public static void main(String[] args) {
-        try (Connection conn = getConnection()) {
-            if (conn != null) {
-                System.out.println("✅ Kết nối SQL Server thành công!");
-            } else {
-                System.out.println("❌ Connection null");
-            }
-        } catch (Exception e) {
-            System.out.println("❌ Kết nối thất bại: " + e.getMessage());
-            e.printStackTrace();
+        Connection conn = getConnection();
+        if (conn != null) {
+            System.out.println("✅ Kết nối thành công MySQL!");
+        } else {
+            System.out.println("❌ Kết nối thất bại!");
         }
     }
 }
